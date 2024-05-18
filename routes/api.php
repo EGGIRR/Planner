@@ -17,7 +17,11 @@ use Illuminate\Support\Facades\Route;
 Route::group([
     'middleware' => 'api',
 ], function ($router) {
-    Route::get('desks', 'App\Http\Controllers\Test@get');
+    Route::get('desks', 'App\Http\Controllers\AuthMain@getDesks');
+    Route::get('tasks', 'App\Http\Controllers\AuthMain@getTasks');
+    Route::get('cards', 'App\Http\Controllers\AuthMain@getCards');
+    Route::get('desk_list', 'App\Http\Controllers\AuthMain@getDeskLists');
+    Route::post('task_edit', 'App\Http\Controllers\AuthMain@taskEdit');
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
