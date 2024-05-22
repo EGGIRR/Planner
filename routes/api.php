@@ -14,10 +14,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('login', 'App\Http\Controllers\Api\AuthController@login');
+Route::middleware('auth:api')->get('/logout', 'App\Http\Controllers\Api\AuthController@logout');
+
 Route::group([
     'middleware' => 'api',
 ], function ($router) {
-    Route::get('desks', 'App\Http\Controllers\AuthMain@getDesks');
+    Route::get('desks', 'App\Http\Controllers\Api\DeskController@index');
+    Route::get('desks/{id}', 'App\Http\Controllers\Api\DeskController@show');
+    Route::post('desks/create', 'App\Http\Controllers\Api\DeskController@store');
+    Route::get('users', 'App\Http\Controllers\Api\UserController@index');
+    Route::post('users/create', 'App\Http\Controllers\Api\UserController@store');
     Route::get('tasks', 'App\Http\Controllers\AuthMain@getTasks');
     Route::get('cards', 'App\Http\Controllers\AuthMain@getCards');
     Route::get('desk_list', 'App\Http\Controllers\AuthMain@getDeskLists');

@@ -13,6 +13,9 @@ class AuthMain extends Controller
     public function getDesks(){
         return response()->json([Desk::all()]);
     }
+    public function getOneDesk($id){
+        return response()->json([Desk::all()]);
+    }
     public function getTasks(){
         return response()->json([Task::all()]);
     }
