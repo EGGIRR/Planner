@@ -15,11 +15,11 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        return [
-            'data' => [
-                'token' => User::where(['email' => $request->email])->first()->generateToken()
-            ]
-        ];
+            return [
+                'data' => [
+                    'token' => User::where(['email' => $request->email])->first()->generateToken(),
+                ]
+            ];
     }
 
     public function logout()

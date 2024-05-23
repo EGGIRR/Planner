@@ -3,9 +3,9 @@
 namespace App\Http\Requests\User;
 
 use App\Models\User;
-use App\Http\Requests\ApiRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends ApiRequest
+class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,8 @@ class LoginRequest extends ApiRequest
     public function rules(): array
     {
         return [
-            //
+            'email' => 'required|email',
+            'password' => 'required',
         ];
     }
 }
