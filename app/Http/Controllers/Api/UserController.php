@@ -3,11 +3,29 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+    public function login(LoginRequest $request)
+    {
+        $token = User::where(['email' => $request->email])->first()->generateToken();
+        return response()->json(['data' => ['token' => $token]]);
+    }
+
+    public function logout()
+    {
+        Auth::user()->logout();
+        return [
+            'data' => [
+                'message' => 'logout'
+            ]
+        ];
+    }
     /**
      * Display a listing of the resource.
      */
@@ -21,8 +39,33 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $created_desk = User::create($request->all());
-        return response()->json(["message" => "User created!", "data" => $created_desk], 201);
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8',
+        ], [
+            'name.required' => 'The name field is required.',
+            'name.string' => 'The name must be a string.',
+            'name.max' => 'The name may not be greater than 255 characters.',
+            'email.required' => 'The email field is required.',
+            'email.email' => 'The email must be a valid email address.',
+            'email.max' => 'The email may not be greater than 255 characters.',
+            'email.unique' => 'The email has already been taken.',
+            'password.required' => 'The password field is required.',
+            'password.string' => 'The password must be a string.',
+            'password.min' => 'The password must be at least 8 characters.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(["message" => "Validation error!",'errors' => $validator->errors()], 422,);
+        }
+
+        $createdUser = User::create($request->all());
+
+        return response()->json([
+            "message" => "User created!",
+            "data" => $createdUser
+        ], 201);
     }
 
     /**
@@ -30,15 +73,47 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        return User::find($id);
     }
 
     /**
      * Update the specified resource in storage.
      */
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, string $id)
     {
-        //
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'string|max:255',
+            'email' => 'email|max:255|unique:users,email,' . $id,
+            'password' => 'string|min:8',
+        ], [
+            'name.string' => 'The name must be a string.',
+            'name.max' => 'The name may not be greater than 255 characters.',
+            'email.email' => 'The email must be a valid email address.',
+            'email.max' => 'The email may not be greater than 255 characters.',
+            'email.unique' => 'The email has already been taken.',
+            'password.string' => 'The password must be a string.',
+            'password.min' => 'The password must be at least 8 characters.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422);
+        }
+
+        $user->update($request->all());
+
+        return response()->json([
+            "message" => "User updated!",
+            "data" => $user
+        ]);
     }
 
     /**
@@ -46,6 +121,14 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->delete();
+
+        return response()->json(['message' => 'User deleted']);
     }
 }

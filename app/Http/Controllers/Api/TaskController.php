@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Desk;
 use App\Models\DeskList;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class DeskController extends Controller
+class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Desk::all();
+        return Task::all();
     }
 
     /**
@@ -24,20 +24,21 @@ class DeskController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'string|max:255|unique:desks,name',
-            'user_id' => 'numeric',
+            'name' => 'string|max:255|unique:tasks,name',
+            'card_id' => 'numeric',
         ], [
             'name.unique' => 'The name has already been taken.',
             'name.string' => 'The name must be a string.',
             'name.max' => 'The name may not be greater than 255 characters.',
-            'user_id.numeric' => 'The user_id must be a number.'
+            'card_id.numeric' => 'The card_id must be a number.'
         ]);
 
         if ($validator->fails()) {
             return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422);
         }
-        $created_desk = Desk::create($request->all());
-        return response()->json(["message" => "Desk created!", "data" => $created_desk], 201);
+
+        $created_desk = Task::create($request->all());
+        return response()->json(["message" => "Task created!", "data" => $created_desk], 201);
     }
 
     /**
@@ -45,7 +46,7 @@ class DeskController extends Controller
      */
     public function show(string $id)
     {
-        return Desk::find($id);
+        return Task::find($id);
     }
 
     /**
@@ -53,26 +54,26 @@ class DeskController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $desk = Desk::find($id);
+        $task = Task::find($id);
 
         $validator = Validator::make($request->all(), [
-            'name' => 'string|max:255|unique:desks,name',
-            'user_id' => 'numeric',
+            'name' => 'string|max:255|unique:tasks,name',
+            'card_id' => 'numeric',
         ], [
             'name.unique' => 'The name has already been taken.',
             'name.string' => 'The name must be a string.',
             'name.max' => 'The name may not be greater than 255 characters.',
-            'user_id.numeric' => 'The user_id must be a number.'
+            'card_id.numeric' => 'The card_id must be a number.'
         ]);
 
         if ($validator->fails()) {
             return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422);
         }
-        $desk->update($request->all());
+        $task->update($request->all());
 
         return response()->json([
-            "message" => "Desk updated!",
-            "data" => $desk
+            "message" => "Task updated!",
+            "data" => $task
         ]);
     }
 
@@ -81,14 +82,14 @@ class DeskController extends Controller
      */
     public function destroy(string $id)
     {
-        $desk = Desk::find($id);
+        $task = Task::find($id);
 
-        if (!$desk) {
-            return response()->json(['message' => 'Desk not found'], 404);
+        if (!$task) {
+            return response()->json(['message' => 'Task not found'], 404);
         }
 
-        $desk->delete();
+        $task->delete();
 
-        return response()->json(['message' => 'Desk deleted']);
+        return response()->json(['message' => 'Task deleted']);
     }
 }

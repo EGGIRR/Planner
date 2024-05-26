@@ -3,19 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Desk;
-use App\Models\DeskList;
+use App\Models\Card;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class DeskController extends Controller
+class CardController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Desk::all();
+        return Card::all();
     }
 
     /**
@@ -24,20 +23,20 @@ class DeskController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'string|max:255|unique:desks,name',
-            'user_id' => 'numeric',
+            'name' => 'string|max:255|unique:cards,name',
+            'desk_list_id' => 'numeric',
         ], [
             'name.unique' => 'The name has already been taken.',
             'name.string' => 'The name must be a string.',
             'name.max' => 'The name may not be greater than 255 characters.',
-            'user_id.numeric' => 'The user_id must be a number.'
+            'desk_list_id.numeric' => 'The desk_id must be a number.'
         ]);
 
         if ($validator->fails()) {
             return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422);
         }
-        $created_desk = Desk::create($request->all());
-        return response()->json(["message" => "Desk created!", "data" => $created_desk], 201);
+        $created_card = Card::create($request->all());
+        return response()->json(["message" => "Desk created!", "data" => $created_card], 201);
     }
 
     /**
@@ -45,7 +44,7 @@ class DeskController extends Controller
      */
     public function show(string $id)
     {
-        return Desk::find($id);
+        return Card::find($id);
     }
 
     /**
@@ -53,26 +52,26 @@ class DeskController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $desk = Desk::find($id);
+        $card = Card::find($id);
 
         $validator = Validator::make($request->all(), [
-            'name' => 'string|max:255|unique:desks,name',
-            'user_id' => 'numeric',
+            'name' => 'string|max:255|unique:cards,name',
+            'desk_list_id' => 'numeric',
         ], [
             'name.unique' => 'The name has already been taken.',
             'name.string' => 'The name must be a string.',
             'name.max' => 'The name may not be greater than 255 characters.',
-            'user_id.numeric' => 'The user_id must be a number.'
+            'desk_list_id.numeric' => 'The desk_list_id must be a number.'
         ]);
 
         if ($validator->fails()) {
             return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422);
         }
-        $desk->update($request->all());
 
+        $card->update($request->all());
         return response()->json([
-            "message" => "Desk updated!",
-            "data" => $desk
+            "message" => "Card updated!",
+            "data" => $card
         ]);
     }
 
@@ -81,14 +80,14 @@ class DeskController extends Controller
      */
     public function destroy(string $id)
     {
-        $desk = Desk::find($id);
+        $card = Card::find($id);
 
-        if (!$desk) {
-            return response()->json(['message' => 'Desk not found'], 404);
+        if (!$card) {
+            return response()->json(['message' => 'Card not found'], 404);
         }
 
-        $desk->delete();
+        $card->delete();
 
-        return response()->json(['message' => 'Desk deleted']);
+        return response()->json(['message' => 'Card deleted']);
     }
 }

@@ -14,32 +14,51 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+//Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//    return $request->user();
+//});
 
-Route::post('login', 'App\Http\Controllers\Api\AuthController@login');
+Route::post('login', 'App\Http\Controllers\Api\UserController@login');
+Route::post('registration', 'App\Http\Controllers\Api\UserController@store');
 
 Route::middleware(['auth:api'])->group(function () {
-    Route::get('/logout', 'App\Http\Controllers\Api\AuthController@logout');
+    Route::get('/logout', 'App\Http\Controllers\Api\UserController@logout');
 
     Route::group(['prefix' => 'desks', 'middleware' => 'api'], function () {
         Route::get('/', 'App\Http\Controllers\Api\DeskController@index');
         Route::get('{id}', 'App\Http\Controllers\Api\DeskController@show');
         Route::post('create', 'App\Http\Controllers\Api\DeskController@store');
+        Route::post('edit/{id}', 'App\Http\Controllers\Api\DeskController@update');
+        Route::get('delete/{id}', 'App\Http\Controllers\Api\DeskController@destroy');
     });
-
 
     Route::group(['prefix' => 'users', 'middleware' => 'api'], function () {
         Route::get('/', 'App\Http\Controllers\Api\UserController@index');
-        Route::post('create', 'App\Http\Controllers\Api\UserController@store');
+        Route::get('{id}', 'App\Http\Controllers\Api\UserController@show');
+        Route::post('edit/{id}', 'App\Http\Controllers\Api\UserController@update');
     });
 
+    Route::group(['prefix' => 'tasks', 'middleware' => 'api'], function () {
+        Route::get('/', 'App\Http\Controllers\Api\TaskController@index');
+        Route::get('{id}', 'App\Http\Controllers\Api\TaskController@show');
+        Route::post('create', 'App\Http\Controllers\Api\TaskController@store');
+        Route::post('edit/{id}', 'App\Http\Controllers\Api\TaskController@update');
+        Route::get('delete/{id}', 'App\Http\Controllers\Api\TaskController@destroy');
+    });
 
-    Route::group(['middleware' => 'api'], function () {
-        Route::get('tasks', 'App\Http\Controllers\AuthMain@getTasks');
-        Route::get('cards', 'App\Http\Controllers\AuthMain@getCards');
-        Route::get('desk_list', 'App\Http\Controllers\AuthMain@getDeskLists');
-        Route::post('task_edit', 'App\Http\Controllers\AuthMain@taskEdit');
+    Route::group(['prefix' => 'cards', 'middleware' => 'api'], function () {
+        Route::get('/', 'App\Http\Controllers\Api\CardController@index');
+        Route::get('{id}', 'App\Http\Controllers\Api\CardController@show');
+        Route::post('create', 'App\Http\Controllers\Api\CardController@store');
+        Route::post('edit/{id}', 'App\Http\Controllers\Api\CardController@update');
+        Route::get('delete/{id}', 'App\Http\Controllers\Api\CardController@destroy');
+    });
+
+    Route::group(['prefix' => 'desk_lists', 'middleware' => 'api'], function () {
+        Route::get('/', 'App\Http\Controllers\Api\DeskListController@index');
+        Route::get('{id}', 'App\Http\Controllers\Api\DeskListController@show');
+        Route::post('create', 'App\Http\Controllers\Api\DeskListController@store');
+        Route::post('edit/{id}', 'App\Http\Controllers\Api\DeskListController@update');
+        Route::get('delete/{id}', 'App\Http\Controllers\Api\DeskListController@destroy');
     });
 });
