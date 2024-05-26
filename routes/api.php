@@ -36,6 +36,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/', 'App\Http\Controllers\Api\UserController@index');
         Route::get('{id}', 'App\Http\Controllers\Api\UserController@show');
         Route::post('edit/{id}', 'App\Http\Controllers\Api\UserController@update');
+        Route::get('delete/{id}', 'App\Http\Controllers\Api\UserController@destroy');
     });
 
     Route::group(['prefix' => 'tasks', 'middleware' => 'api'], function () {

@@ -127,6 +127,10 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
+        if ($user->id !== Auth::id()) {
+            return response()->json(['message' => 'You cannot delete other users!'], 403);
+        }
+
         $user->delete();
 
         return response()->json(['message' => 'User deleted']);
