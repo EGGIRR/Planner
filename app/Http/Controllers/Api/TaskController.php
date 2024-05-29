@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\DeskList;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,6 +16,12 @@ class TaskController extends Controller
     {
         return Task::all();
     }
+    public function complete(string $id){
+        $task = Task::find($id);
+        $task->completed = true;
+        $task->save();
+        return response()->json(["message" => "Task completed!", "data" => $task]);
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -25,12 +30,12 @@ class TaskController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'string|max:255|unique:tasks,name',
-            'card_id' => 'numeric',
+            'desk_id' => 'numeric',
         ], [
             'name.unique' => 'The name has already been taken.',
             'name.string' => 'The name must be a string.',
             'name.max' => 'The name may not be greater than 255 characters.',
-            'card_id.numeric' => 'The card_id must be a number.'
+            'desk_id.numeric' => 'The desk_id must be a number.'
         ]);
 
         if ($validator->fails()) {

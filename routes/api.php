@@ -45,6 +45,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('create', 'App\Http\Controllers\Api\TaskController@store');
         Route::patch('edit/{id}', 'App\Http\Controllers\Api\TaskController@update');
         Route::delete('delete/{id}', 'App\Http\Controllers\Api\TaskController@destroy');
+        Route::post('complete/{id}', 'App\Http\Controllers\Api\TaskController@complete');
     });
 
     Route::group(['prefix' => 'cards', 'middleware' => 'api'], function () {

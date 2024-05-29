@@ -10,6 +10,6 @@ class Task extends Model
     use HasFactory;
     protected $fillable = [
         'name',
-        'card_id'
+        'desk_id'
     ];
 }
