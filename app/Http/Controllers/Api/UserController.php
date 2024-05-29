@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\User\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,21 +10,37 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function login(LoginRequest $request)
+    public function login(Request $request)
     {
-        $token = User::where(['email' => $request->email])->first()->generateToken();
-        return response()->json(['data' => ['token' => $token]]);
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required',
+        ], [
+            'email.required' => 'The email field is required.',
+            'email.email' => 'The email must be a valid email address.',
+            'password.required' => 'The password field is required.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422,);
+        }
+
+
+        if (User::where('email', $request->email)
+            ->where('password', $request->password)->first()) {
+            $token = User::where(['email' => $request->email])->first()->generateToken();
+            return response()->json(['data' => ['token' => $token]]);
+        } else {
+            return response()->json(['data' => ['message' => 'login failed']],401);
+        }
     }
 
     public function logout()
     {
         Auth::user()->logout();
-        return [
-            'data' => [
-                'message' => 'logout'
-            ]
-        ];
+        return response()->json(['data' => ['message' => 'logout']]);
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -57,7 +72,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(["message" => "Validation error!",'errors' => $validator->errors()], 422,);
+            return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422,);
         }
 
         $createdUser = User::create($request->all());
