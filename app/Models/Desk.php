@@ -13,8 +13,5 @@ class Desk extends Model
         "name",
         "user_id"
     ];
-    public function deskLists()
-    {
-        return $this->hasMany(DeskList::class);
-    }
+
 }

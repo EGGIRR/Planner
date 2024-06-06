@@ -4,65 +4,57 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Desk;
-use App\Models\DeskList;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class DeskController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return Desk::all();
+        $desks = Desk::select('desks.id','desks.name')
+            ->where('user_id', Auth::id())->get();
+        return response()->json(['data' => ['desks' => $desks]]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'string|max:255|unique:desks,name',
-            'user_id' => 'numeric',
+            'name' => 'required|string|max:255',
         ], [
-            'name.unique' => 'The name has already been taken.',
+            'name.required' => 'The name field is required.',
             'name.string' => 'The name must be a string.',
             'name.max' => 'The name may not be greater than 255 characters.',
-            'user_id.numeric' => 'The user_id must be a number.'
         ]);
 
         if ($validator->fails()) {
             return response()->json(["message" => "Validation error!", 'errors' => $validator->errors()], 422);
         }
-        $created_desk = Desk::create($request->all());
+        $data = $request->all();
+        $data['user_id'] = Auth::id();
+        $created_desk = Desk::create($data);
         return response()->json(["message" => "Desk created!", "data" => $created_desk], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        return Desk::find($id);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
+        $mydesks = DB::table('desks')
+            ->select('desks.*')
+            ->where('desks.user_id', Auth::user()->id)
+            ->pluck('id')
+            ->all();
+
+        if (!in_array($id, $mydesks)) {
+            return response()->json(["message" => "Desk not found in your desks!"], 404);
+        }
         $desk = Desk::find($id);
 
         $validator = Validator::make($request->all(), [
-            'name' => 'string|max:255|unique:desks,name',
-            'user_id' => 'numeric',
+            'name' => 'string|max:255',
         ], [
-            'name.unique' => 'The name has already been taken.',
             'name.string' => 'The name must be a string.',
             'name.max' => 'The name may not be greater than 255 characters.',
-            'user_id.numeric' => 'The user_id must be a number.'
         ]);
 
         if ($validator->fails()) {
@@ -70,25 +62,25 @@ class DeskController extends Controller
         }
         $desk->update($request->all());
 
-        return response()->json([
-            "message" => "Desk updated!",
-            "data" => $desk
-        ]);
+        return response()->json(["message" => "Desk updated!", "data" => $desk]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        $desk = Desk::find($id);
+        $mydesks = DB::table('desks')
+            ->select('desks.*')
+            ->where('desks.user_id', Auth::user()->id)
+            ->pluck('id')
+            ->all();
 
+        if (!in_array($id, $mydesks)) {
+            return response()->json(["message" => "Desk not found in your desks!"], 404);
+        }
+        $desk = Desk::find($id);
         if (!$desk) {
             return response()->json(['message' => 'Desk not found'], 404);
         }
-
         $desk->delete();
-
         return response()->json(['message' => 'Desk deleted']);
     }
 }

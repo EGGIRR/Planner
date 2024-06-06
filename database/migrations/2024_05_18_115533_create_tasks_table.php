@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('desk_id')->constrained('desks')->onDelete('cascade');;
             $table->boolean('completed')->default(false);
+            $table->string('img')->nullable();
+            $table->date('date');
+            $table->boolean('expired')->default(false);
             $table->timestamps();
         });
     }
