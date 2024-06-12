@@ -51,6 +51,24 @@ class TaskController extends Controller
             ->get();
         return response()->json(['data' => ['tasks' => $tasks]]);
     }
+    public function image(string $id)
+    {
+        $mytasks = DB::table('tasks')
+            ->join('desks', 'tasks.desk_id', '=', 'desks.id')
+            ->select('tasks.*')
+            ->where('desks.user_id', Auth::user()->id)
+            ->pluck('id')
+            ->all();
+
+        if (!in_array($id, $mytasks)) {
+            return response()->json(["message" => "Task not found in your tasks!"], 404);
+        }
+        $task = Task::find($id);
+
+        $img = $task->img;
+        $filePath = storage_path('app/public/'. $img);
+        return response()->file($filePath);
+    }
 
     public function uncompletedTasks()
     {

@@ -33,6 +33,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::group(['prefix' => 'users', 'middleware' => 'api'], function () {
         Route::get('/', 'App\Http\Controllers\Api\UserController@index');
+        Route::get('/avatar', 'App\Http\Controllers\Api\UserController@avatar');
         Route::patch('edit/{id}', 'App\Http\Controllers\Api\UserController@update');
         Route::post('edit/avatar/{id}', 'App\Http\Controllers\Api\UserController@updateAvatar');
         Route::delete('delete/{id}', 'App\Http\Controllers\Api\UserController@destroy');
@@ -40,6 +41,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::group(['prefix' => 'tasks', 'middleware' => 'api'], function () {
         Route::get('/', 'App\Http\Controllers\Api\TaskController@index');
+        Route::get('/image/{id}', 'App\Http\Controllers\Api\TaskController@image');
         Route::post('create', 'App\Http\Controllers\Api\TaskController@store');
         Route::patch('edit/{id}', 'App\Http\Controllers\Api\TaskController@update');
         Route::post('edit/img/{id}', 'App\Http\Controllers\Api\TaskController@updateImg');
